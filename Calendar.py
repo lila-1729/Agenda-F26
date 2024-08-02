@@ -37,6 +37,8 @@ CUT_OPACITY = 0.7
 CUT_DASHLINE = 20
 CUT_DASHSPACE = 20
 
+PATH_FREITAGLOGO = "/home/..."
+
 # Output File
 Output = canvas.Canvas("Calendar.pdf",
                        pagesize=(DOC_WIDTH+CUT_WIDTH,DOC_HEIGHT+CUT_WIDTH)) 
@@ -220,8 +222,8 @@ def Cover():
     Output.setFillGray(1)
     #Output.drawString(50,40,"Design by")
     Output.setFillGray(0)
-    #Output.drawString(243,40,"Jakob H.")
-    Output.drawInlineImage("/home/lila/Desktop/Kalender-Piano/freitag-logo.png",
+    #Output.drawString(243,40,"design")
+    Output.drawInlineImage(PATH_FREITAGLOGO,
                            50 ,450,1024/15,341/15)
     Output.showPage()
     Output.showPage()
