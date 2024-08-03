@@ -32,12 +32,14 @@ DOC_WIDTH = 328
 DOC_MARGININ = 28
 DOC_MARGINOUT = 14
 
-GRID_VPOS = 480
-GRID_WIDTH = 160-28
+GRID_YPOS = 480
+GRID_XSPACE = 8
+GRID_WIDTH = (DOC_WIDTH-DOC_MARGINOUT-DOC_MARGININ - GRID_XSPACE)/2 
 GRID_HEIGHT = 11.34
 GRID_LINE = 0.6
 GRID_OPACITY = 0.5
 GRID_NUMBER = 42
+GRID_TIME = 31
 
 CUT_WIDTH = 0.3
 CUT_OPACITY = 0.7
@@ -118,11 +120,11 @@ def LeftDesign(DAY_0, DAY_1, DAY_2, DAY_3):
     LineY = []
     chopped = int(GRID_NUMBER /2)
     for count in range(GRID_NUMBER):
-        LineY.append(GRID_VPOS-count*GRID_HEIGHT)  
-    LineNumber = 42 # must be even
-
-    LineX1= [DOC_MARGINOUT,52,DOC_MARGINOUT+GRID_WIDTH] 
-    LineX2= [168,192,DOC_WIDTH-DOC_MARGININ]
+        LineY.append(GRID_YPOS-count*GRID_HEIGHT)  
+    
+    GridPosX2 = DOC_WIDTH-DOC_MARGININ-GRID_WIDTH 
+    LineX1= [DOC_MARGINOUT,DOC_MARGINOUT+GRID_TIME,DOC_MARGINOUT+GRID_WIDTH] 
+    LineX2= [GridPosX2,GridPosX2+GRID_TIME,DOC_WIDTH-DOC_MARGININ]
     LineY1, LineY2 = LineY[:chopped], LineY[chopped:]
 
     Output.grid(LineX1,LineY2)
@@ -130,19 +132,18 @@ def LeftDesign(DAY_0, DAY_1, DAY_2, DAY_3):
     Output.grid(LineX2,LineY1)
     Output.grid(LineX2,LineY2)
 
-    Padding = 0.3
     Output.setFillGray(0.90)
-    Output.rect(LineX1[0]+Padding,LineY1[1]+Padding,GRID_WIDTH-2*Padding,GRID_HEIGHT-2*Padding, stroke=0, fill=1)
-    Output.rect(LineX2[0]+Padding,LineY1[1]+Padding,GRID_WIDTH-2*Padding,GRID_HEIGHT-2*Padding, stroke=0, fill=1)
-    Output.rect(LineX1[0]+Padding,LineY2[1]+Padding,GRID_WIDTH-2*Padding,GRID_HEIGHT-2*Padding, stroke=0, fill=1)
-    Output.rect(LineX2[0]+Padding,LineY2[1]+Padding,GRID_WIDTH-2*Padding,GRID_HEIGHT-2*Padding, stroke=0, fill=1)
+    Output.rect(LineX1[0],LineY1[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
+    Output.rect(LineX2[0],LineY1[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
+    Output.rect(LineX1[0],LineY2[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
+    Output.rect(LineX2[0],LineY2[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
     Output.setFillGray(0)
 
     Output.setFont('CourierBd', 9)
-    Output.drawString(LineX1[0]+3,LineY1[1]+3,DAY_0.strftime("%-d"))
-    Output.drawString(LineX2[0]+3,LineY1[1]+3,DAY_1.strftime("%-d"))
-    Output.drawString(LineX1[0]+3,LineY2[1]+3,DAY_2.strftime("%-d"))
-    Output.drawString(LineX2[0]+3,LineY2[1]+3,DAY_3.strftime("%-d"))
+    Output.drawString(LineX1[0]+3,LineY1[1]+3,DAY_0.strftime("%d"))
+    Output.drawString(LineX2[0]+3,LineY1[1]+3,DAY_1.strftime("%d"))
+    Output.drawString(LineX1[0]+3,LineY2[1]+3,DAY_2.strftime("%d"))
+    Output.drawString(LineX2[0]+3,LineY2[1]+3,DAY_3.strftime("%d"))
 
     Output.setFont('Courier', 9)
     Output.drawString(LineX1[1]+3,LineY1[1]+3,DAY_0.strftime("%A"))
@@ -152,12 +153,12 @@ def LeftDesign(DAY_0, DAY_1, DAY_2, DAY_3):
 
     Output.setFont('Courier', 11)
     if DAY_0.strftime("%B") == DAY_3.strftime("%B"):
-        Output.drawString(28,490,DAY_0.strftime("%B"))
+        Output.drawString(LineX1[0],GRID_YPOS+10,DAY_0.strftime("%B"))
     else:
-        Output.drawString(28,490,DAY_0.strftime("%B")+" - "+DAY_3.strftime("%B"))
+        Output.drawString(LineX1[0],GRID_YPOS+10,DAY_0.strftime("%B")+" - "+DAY_3.strftime("%B"))
 
     Output.setFont('Courier', 9)
-    Output.drawRightString(300,490,DAY_0.strftime("Week %-W"))
+    Output.drawRightString(LineX2[2],GRID_YPOS+10,DAY_0.strftime("Week %W"))
 
     Cut()
 
@@ -183,12 +184,12 @@ def RightDesign(DAY_4, DAY_5, DAY_6):
     Output.grid(LineX2,LineY1) 
     Output.grid(LineNotes,LineY2)
 
-    Padding = 0.3
+    BoxPadding = 0.3
     Output.setFillGray(0.90)
-    Output.rect(LineX1[0]+Padding,LineY1[1]+Padding,GRID_WIDTH-2*Padding,GRID_HEIGHT-2*Padding, stroke=0, fill=1)
-    Output.rect(LineX2[0]+Padding,LineY2[1]+Padding,GRID_WIDTH-2*Padding,GRID_HEIGHT-2*Padding, stroke=0, fill=1)
-    Output.rect(LineX2[0]+Padding,LineY1[1]+Padding,GRID_WIDTH-2*Padding,GRID_HEIGHT-2*Padding, stroke=0, fill=1)
-    Output.rect(LineX1[0]+Padding,LineY2[1]+Padding,GRID_WIDTH-2*Padding,GRID_HEIGHT-2*Padding, stroke=0, fill=1)
+    Output.rect(LineX1[0]+BoxPadding,LineY1[1]+BoxPadding,GRID_WIDTH-2*BoxPadding,GRID_HEIGHT-2*BoxPadding, stroke=0, fill=1)
+    Output.rect(LineX2[0]+BoxPadding,LineY2[1]+BoxPadding,GRID_WIDTH-2*BoxPadding,GRID_HEIGHT-2*BoxPadding, stroke=0, fill=1)
+    Output.rect(LineX2[0]+BoxPadding,LineY1[1]+BoxPadding,GRID_WIDTH-2*BoxPadding,GRID_HEIGHT-2*BoxPadding, stroke=0, fill=1)
+    Output.rect(LineX1[0]+BoxPadding,LineY2[1]+BoxPadding,GRID_WIDTH-2*BoxPadding,GRID_HEIGHT-2*BoxPadding, stroke=0, fill=1)
     Output.setFillGray(0)
 
     Output.setFont('CourierBd', 9)
