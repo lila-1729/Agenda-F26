@@ -2,7 +2,7 @@
 # Pagesize      = 11.6cm x 18.2cm ~ 328 x 515 (actual 328.3 x 515.3) 
 #               = 328.82 x 515.88 
 # Line Height   = 4mm   = 11.34pt ~ 11
-# Outer Margin  = 4mm   = 11.34pt ~ 11
+# Outer Margin  = 4mm   = 11.34pt ~ 14
 # Inner Margin  = 1.0cm = 28.35pt ~ 28
 # Timeduration  = 1.2cm = 34.02pt ~ 34
 # Timeinterval  = 1.1cm = 31.18pt ~ 31
@@ -24,20 +24,27 @@ from reportlab.graphics import renderPM
 # Constants
 CALENDAR_START = datetime.date(2024,12,30) 
 CALENDAR_RANGE = 52
+
 OVERVIEW_YEARS = [2025,2026]
 
 DOC_HEIGHT = 515
 DOC_WIDTH = 328
+DOC_MARGININ = 28
+DOC_MARGINOUT = 14
 
+GRID_VPOS = 480
 GRID_WIDTH = 160-28
 GRID_HEIGHT = 11.34
+GRID_LINE = 0.6
+GRID_OPACITY = 0.5
+GRID_NUMBER = 42
 
 CUT_WIDTH = 0.3
 CUT_OPACITY = 0.7
 CUT_DASHLINE = 20
 CUT_DASHSPACE = 20
 
-PATH_FREITAGLOGO = "/home/..."
+PATH_FREITAGLOGO = "/home/lila/Desktop/Agenda-F26/Cover/freitag-logo.png"
 
 # Output File
 Output = canvas.Canvas("Calendar.pdf",
@@ -95,24 +102,27 @@ for year in OVERVIEW_YEARS:
 # Calendar
 def Calendar():
     RightDesign(CalendarList[0][4]-OffsetWeek,CalendarList[0][5]-OffsetWeek,CalendarList[0][6]-OffsetWeek)
+
     for WeekCount in range(CALENDAR_RANGE):
         LeftDesign(CalendarList[WeekCount][0],CalendarList[WeekCount][1],CalendarList[WeekCount][2],CalendarList[WeekCount][3])
         RightDesign(CalendarList[WeekCount][4],CalendarList[WeekCount][5],CalendarList[WeekCount][6])
+
     LeftDesign(CalendarList[-1][0]+OffsetWeek,CalendarList[-1][1]+OffsetWeek,CalendarList[-1][2]+OffsetWeek,CalendarList[-1][3]+OffsetWeek)
+
     Output.showPage()
 
 def LeftDesign(DAY_0, DAY_1, DAY_2, DAY_3):
-    Output.setLineWidth(.6)
-    Output.setStrokeGray(0.5)
+    Output.setLineWidth(GRID_LINE)
+    Output.setStrokeGray(GRID_OPACITY)
 
     LineY = []
-    lineNumber = 42 # must be even
-    chopped = int(lineNumber /2)
-    for count in range(lineNumber):
-        #502 originally
-        LineY.append(480-count*GRID_HEIGHT)  
-    LineX1= [14,52,160] 
-    LineX2= [168,192,300]
+    chopped = int(GRID_NUMBER /2)
+    for count in range(GRID_NUMBER):
+        LineY.append(GRID_VPOS-count*GRID_HEIGHT)  
+    LineNumber = 42 # must be even
+
+    LineX1= [DOC_MARGINOUT,52,DOC_MARGINOUT+GRID_WIDTH] 
+    LineX2= [168,192,DOC_WIDTH-DOC_MARGININ]
     LineY1, LineY2 = LineY[:chopped], LineY[chopped:]
 
     Output.grid(LineX1,LineY2)
@@ -159,9 +169,8 @@ def RightDesign(DAY_4, DAY_5, DAY_6):
 
 
     LineY = []
-    lineNumber = 42 # must be even
-    chopped = int(lineNumber /2)
-    for count in range(lineNumber):
+    chopped = int(GRID_NUMBER /2)
+    for count in range(GRID_NUMBER):
         #502 originally
         LineY.append(480-count*GRID_HEIGHT)  
     LineX1= [28,52,160] 
@@ -223,8 +232,7 @@ def Cover():
     #Output.drawString(50,40,"Design by")
     Output.setFillGray(0)
     #Output.drawString(243,40,"design")
-    Output.drawInlineImage(PATH_FREITAGLOGO,
-                           50 ,450,1024/15,341/15)
+    Output.drawInlineImage(PATH_FREITAGLOGO,50 ,450,1024/15,341/15)
     Output.showPage()
     Output.showPage()
 
