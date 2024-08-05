@@ -39,6 +39,7 @@ GRID_WIDTH = (DOC_WIDTH-DOC_MARGINOUT-DOC_MARGININ - GRID_XSPACE)/2
 GRID_HEIGHT = 11.34
 GRID_LINE = 0.6
 GRID_OPACITY = 0.5
+GRID_BOX = 0.9
 GRID_NUMBER = 42
 GRID_TIME = 31
 
@@ -132,7 +133,7 @@ def LeftDesign(DAY_0, DAY_1, DAY_2, DAY_3):
     Output.grid(LineX2,LineY1)
     Output.grid(LineX2,LineY2)
 
-    Output.setFillGray(0.90)
+    Output.setFillGray(GRID_BOX)
     Output.rect(LineX1[0],LineY1[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
     Output.rect(LineX2[0],LineY1[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
     Output.rect(LineX1[0],LineY2[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
@@ -183,7 +184,7 @@ def RightDesign(DAY_4, DAY_5, DAY_6):
     Output.grid(LineX2,LineY1)
     Output.grid(LineX2,LineY2)
 
-    Output.setFillGray(0.90)
+    Output.setFillGray(GRID_BOX)
     Output.rect(LineX1[0],LineY1[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
     Output.rect(LineX2[0],LineY1[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
     Output.rect(LineX1[0],LineY2[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
@@ -241,17 +242,16 @@ def Overview():
 
     LineY = []
 
-    LineY_height = OVERVIEW_YPOS 
     for year in OverviewList:
         for month in year:
             LineCount = 0
             LineYi = []
             for week in month:
                 LineYj = []
-                LineYj.append(LineY_height-LineCount*GRID_HEIGHT)
+                LineYj.append(OVERVIEW_YPOS-LineCount*GRID_HEIGHT)
                 LineCount += 1
                 for day in week:
-                    LineYj.append(LineY_height-LineCount*GRID_HEIGHT)  
+                    LineYj.append(OVERVIEW_YPOS-LineCount*GRID_HEIGHT)  
                     LineCount += 1
                 LineYi.append(LineYj)
             LineY.append(LineYi)
@@ -262,18 +262,18 @@ def Overview():
 
     GridCount = 0
     PageCount = 0
-
     MonthCount = 0
+
     for month in LineY:
-        Output.setFillGray(0.90)
-        Output.rect(LineX[GridCount][0],month[0][0]+GRID_HEIGHT,GRID_WIDTH,GRID_HEIGHT,
-                    stroke=1, fill=1)
+        Output.setFillGray(GRID_BOX)
+        Output.rect(LineX[GridCount][0],month[0][0]+GRID_HEIGHT,GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
         Output.setFillGray(0)
         Output.setFont('CourierBd', 9)
         Output.drawString(LineX[GridCount][0]+3,month[0][0]+GRID_HEIGHT+3,OverviewList_merged[MonthCount][0][0].strftime("%m"))
         Output.setFont('Courier', 9)
         Output.drawString(LineX[GridCount][0]+19.5,month[0][0]+GRID_HEIGHT+3,OverviewList_merged[MonthCount][0][0].strftime("%B"))
         Output.setFont('Courier', 9)
+
         WeekCount = 0
         for week in month:
             Output.grid(LineX[GridCount],week)
@@ -284,6 +284,7 @@ def Overview():
 
         GridCount += 1
         GridCount %= 2
+
         if GridCount == 0:
             if PageCount == 0:
                 Output.setFont('Courier', 11)
@@ -298,16 +299,17 @@ def Overview():
                 LineX[1] = [x+DOC_MARGININ-DOC_MARGINOUT for x in LineX[1]]
 
             if month != LineY[-1]:
+                Cut()
                 Output.showPage()
-            Output.setLineWidth(.6)
-            Output.setStrokeGray(0.5)
+
+            Output.setLineWidth(GRID_LINE)
+            Output.setStrokeGray(GRID_OPACITY) 
             Output.setFont('Courier', 9)
             PageCount += 1
             PageCount %= 2
 
-
-
         MonthCount += 1
+
 
 
 # Print to Output File
