@@ -182,7 +182,8 @@ def RightDesign(DAY_4, DAY_5, DAY_6):
     Output.grid(LineX1,LineY2)
     Output.grid(LineX1,LineY1)
     Output.grid(LineX2,LineY1)
-    Output.grid(LineX2,LineY2)
+    LineX2_Notes = [LineX2[0],LineX2[2]]
+    Output.grid(LineX2_Notes,LineY2)
 
     Output.setFillGray(GRID_BOX)
     Output.rect(LineX1[0],LineY1[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
