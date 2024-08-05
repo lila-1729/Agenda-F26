@@ -26,6 +26,7 @@ CALENDAR_START = datetime.date(2024,12,30)
 CALENDAR_RANGE = 52
 
 OVERVIEW_YEARS = [2025,2026]
+OVERVIEW_YPOS = 450 
 
 DOC_HEIGHT = 515
 DOC_WIDTH = 328
@@ -41,9 +42,9 @@ GRID_OPACITY = 0.5
 GRID_NUMBER = 42
 GRID_TIME = 31
 
-CUT_WIDTH = 0.3
+CUT_WIDTH = 0.15
 CUT_OPACITY = 0.7
-CUT_DASHLINE = 20
+CUT_DASHLINE = 12
 CUT_DASHSPACE = 20
 
 PATH_FREITAGLOGO = "/home/lila/Desktop/Agenda-F26/Cover/freitag-logo.png"
@@ -60,14 +61,14 @@ pdfmetrics.registerFont(TTFont('CourierBd', 'CourierPrime-Bold.ttf'))
 
 # Cutting Grid
 def Cut():
-    Output.setLineWidth(CUT_WIDTH)
+    Output.setLineWidth(CUT_WIDTH*2)
     Output.setStrokeGray(CUT_OPACITY)
     Output.setDash(CUT_DASHLINE,CUT_DASHSPACE)
 
-    Output.line(0,DOC_HEIGHT-CUT_WIDTH,DOC_WIDTH,DOC_HEIGHT-CUT_WIDTH)
+    Output.line(0,DOC_HEIGHT,DOC_WIDTH,DOC_HEIGHT)
     Output.line(CUT_WIDTH,0,CUT_WIDTH,DOC_HEIGHT)
     Output.line(DOC_WIDTH-CUT_WIDTH,0,DOC_WIDTH-CUT_WIDTH,DOC_HEIGHT)
-    Output.line(0,1,DOC_WIDTH,1)
+    Output.line(0,CUT_WIDTH*2,DOC_WIDTH,CUT_WIDTH*2)
 
 
 # Calendar List
@@ -111,7 +112,6 @@ def Calendar():
 
     LeftDesign(CalendarList[-1][0]+OffsetWeek,CalendarList[-1][1]+OffsetWeek,CalendarList[-1][2]+OffsetWeek,CalendarList[-1][3]+OffsetWeek)
 
-    Output.showPage()
 
 def LeftDesign(DAY_0, DAY_1, DAY_2, DAY_3):
     Output.setLineWidth(GRID_LINE)
@@ -165,63 +165,57 @@ def LeftDesign(DAY_0, DAY_1, DAY_2, DAY_3):
     Output.showPage()
 
 def RightDesign(DAY_4, DAY_5, DAY_6):
-    Output.setLineWidth(.6)
-    Output.setStrokeGray(0.5)
-
+    Output.setLineWidth(GRID_LINE)
+    Output.setStrokeGray(GRID_OPACITY)
 
     LineY = []
     chopped = int(GRID_NUMBER /2)
     for count in range(GRID_NUMBER):
-        #502 originally
-        LineY.append(480-count*GRID_HEIGHT)  
-    LineX1= [28,52,160] 
-    LineX2= [168,192,314]
-    LineNotes = [168,314]
+        LineY.append(GRID_YPOS-count*GRID_HEIGHT)  
+    
+    GridPosX2 = DOC_WIDTH-DOC_MARGINOUT-GRID_WIDTH 
+    LineX1= [DOC_MARGININ,DOC_MARGININ+GRID_TIME,DOC_MARGININ+GRID_WIDTH] 
+    LineX2= [GridPosX2,GridPosX2+GRID_TIME,DOC_WIDTH-DOC_MARGINOUT]
     LineY1, LineY2 = LineY[:chopped], LineY[chopped:]
 
     Output.grid(LineX1,LineY2)
     Output.grid(LineX1,LineY1)
-    Output.grid(LineX2,LineY1) 
-    Output.grid(LineNotes,LineY2)
+    Output.grid(LineX2,LineY1)
+    Output.grid(LineX2,LineY2)
 
-    BoxPadding = 0.3
     Output.setFillGray(0.90)
-    Output.rect(LineX1[0]+BoxPadding,LineY1[1]+BoxPadding,GRID_WIDTH-2*BoxPadding,GRID_HEIGHT-2*BoxPadding, stroke=0, fill=1)
-    Output.rect(LineX2[0]+BoxPadding,LineY2[1]+BoxPadding,GRID_WIDTH-2*BoxPadding,GRID_HEIGHT-2*BoxPadding, stroke=0, fill=1)
-    Output.rect(LineX2[0]+BoxPadding,LineY1[1]+BoxPadding,GRID_WIDTH-2*BoxPadding,GRID_HEIGHT-2*BoxPadding, stroke=0, fill=1)
-    Output.rect(LineX1[0]+BoxPadding,LineY2[1]+BoxPadding,GRID_WIDTH-2*BoxPadding,GRID_HEIGHT-2*BoxPadding, stroke=0, fill=1)
+    Output.rect(LineX1[0],LineY1[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
+    Output.rect(LineX2[0],LineY1[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
+    Output.rect(LineX1[0],LineY2[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
+    Output.rect(LineX2[0],LineY2[1],GRID_WIDTH,GRID_HEIGHT, stroke=1, fill=1)
     Output.setFillGray(0)
 
     Output.setFont('CourierBd', 9)
-    Output.drawString(LineX1[0]+3,LineY1[1]+3,DAY_4.strftime("%-d"))
-    Output.drawString(LineX2[0]+3,LineY1[1]+3,DAY_5.strftime("%-d"))
-    Output.drawString(LineX1[0]+3,LineY2[1]+3,DAY_6.strftime("%-d"))
+    Output.drawString(LineX1[0]+3,LineY1[1]+3,DAY_4.strftime("%d"))
+    Output.drawString(LineX2[0]+3,LineY1[1]+3,DAY_5.strftime("%d"))
+    Output.drawString(LineX1[0]+3,LineY2[1]+3,DAY_6.strftime("%d"))
 
     Output.setFont('Courier', 9)
+    Output.drawString(LineX2[0]+3,LineY2[1]+3,"Notes")
     Output.drawString(LineX1[1]+3,LineY1[1]+3,DAY_4.strftime("%A"))
     Output.drawString(LineX2[1]+3,LineY1[1]+3,DAY_5.strftime("%A"))
     Output.drawString(LineX1[1]+3,LineY2[1]+3,DAY_6.strftime("%A"))
-    Output.drawString(LineX2[0]+3,LineY2[1]+3,"Notes")
-    #Output.drawString(LineX2[1]+3,LineY2[1]+3,DAY_4.strftime("%A"))
 
     Output.setFont('Courier', 11)
     if DAY_4.strftime("%B") == DAY_6.strftime("%B"):
-        Output.drawRightString(300,490,DAY_4.strftime("%B"))
+        Output.drawRightString(LineX2[2],GRID_YPOS+10,DAY_4.strftime("%B"))
     else:
-        Output.drawRightString(300,490,DAY_4.strftime("%B")+" - "+DAY_6.strftime("%B"))
+        Output.drawRightString(LineX2[2],GRID_YPOS+10,DAY_4.strftime("%B")+" - "+DAY_6.strftime("%B"))
 
-    Output.line(0,0,400,0)
     Output.setFont('Courier', 9)
-    Output.drawString(28,490,DAY_4.strftime("Week %-W"))
+    Output.drawString(LineX1[0],GRID_YPOS+10,DAY_4.strftime("Week %W"))
 
-    Cut() 
+    Cut()
 
     Output.showPage()
 
 
 def Cover():
-    #Output.rect(0,38,240,10, stroke=0, fill=1)
-    #Output.setFillGray(0.8)
     Output.rect(0,13,30,490, stroke=0, fill=1)
     Output.setFillGray(0)
     Output.setFont('CourierBd', 28)
@@ -229,10 +223,6 @@ def Cover():
     Output.setFont('Courier', 20)
     Output.drawString(50,325+40,"2024")
     Output.setFont('CourierBd', 10)
-    Output.setFillGray(1)
-    #Output.drawString(50,40,"Design by")
-    Output.setFillGray(0)
-    #Output.drawString(243,40,"design")
     Output.drawInlineImage(PATH_FREITAGLOGO,50 ,450,1024/15,341/15)
     Output.showPage()
     Output.showPage()
@@ -240,25 +230,18 @@ def Cover():
 
 
 def Overview():
-    Output.setLineWidth(.6)
-    Output.setStrokeGray(0.5)
+    Output.setLineWidth(GRID_LINE)
+    Output.setStrokeGray(GRID_OPACITY)
     Output.setFont('Courier', 9)
-    Padding = 3
-       
-    # For 3 columns
-    #LineX1 = [28,114] 
-    #LineX2 = [121,207]
-    #LineX3 = [214,300]
-    #LineX = [LineX1,LineX2,LineX3]
 
-    # For 2 columns
-    LineX1= [28,160] 
-    LineX2= [168,314]
+    GridPosX2 = DOC_WIDTH-DOC_MARGINOUT-GRID_WIDTH 
+    LineX1= [DOC_MARGININ,DOC_MARGININ+GRID_WIDTH] 
+    LineX2= [GridPosX2,DOC_WIDTH-DOC_MARGINOUT]
     LineX = [LineX1,LineX2]
 
     LineY = []
 
-    LineY_height = 450 # Or 502
+    LineY_height = OVERVIEW_YPOS 
     for year in OverviewList:
         for month in year:
             LineCount = 0
@@ -274,7 +257,6 @@ def Overview():
             LineY.append(LineYi)
     
     
-    # Ugly method of extending
     OverviewList_merged = OverviewList[0]
     OverviewList_merged.extend(OverviewList[1])
 
@@ -295,30 +277,35 @@ def Overview():
         WeekCount = 0
         for week in month:
             Output.grid(LineX[GridCount],week)
-            Output.drawRightString(LineX[GridCount][1],week[0]+Padding,OverviewList_merged[MonthCount][WeekCount][0].strftime("%-W"))
+            Output.drawRightString(LineX[GridCount][1],week[0]+3,OverviewList_merged[MonthCount][WeekCount][0].strftime("%W"))
             for i in range(len(week)-1):
-                Output.drawString(LineX[GridCount][0]+Padding,week[i+1]+Padding,OverviewList_merged[MonthCount][WeekCount][i].strftime("%d %a"))
+                Output.drawString(LineX[GridCount][0]+3,week[i+1]+3,OverviewList_merged[MonthCount][WeekCount][i].strftime("%d %a"))
             WeekCount += 1
+
         GridCount += 1
         GridCount %= 2
         if GridCount == 0:
             if PageCount == 0:
                 Output.setFont('Courier', 11)
-                Output.drawRightString(LineX[1][1],490,OverviewList_merged[MonthCount][0][0].strftime("%Y"))
-                LineX[1][1] -= 14
-                LineX[0][0] -= 14
+                Output.drawRightString(LineX[1][1],OVERVIEW_YPOS+40,OverviewList_merged[MonthCount][0][0].strftime("%Y"))
+
+                LineX[0] = [x+DOC_MARGINOUT-DOC_MARGININ for x in LineX[0]]
+                LineX[1] = [x+DOC_MARGINOUT-DOC_MARGININ for x in LineX[1]]
             else:
                 Output.setFont('Courier', 11)
-                Output.drawString(LineX[0][0],490,OverviewList_merged[MonthCount][0][0].strftime("%Y"))
-                LineX[1][1] += 14
-                LineX[0][0] += 14
+                Output.drawString(LineX[0][0],OVERVIEW_YPOS+40,OverviewList_merged[MonthCount][0][0].strftime("%Y"))
+                LineX[0] = [x+DOC_MARGININ-DOC_MARGINOUT for x in LineX[0]]
+                LineX[1] = [x+DOC_MARGININ-DOC_MARGINOUT for x in LineX[1]]
 
-            Output.showPage()
+            if month != LineY[-1]:
+                Output.showPage()
             Output.setLineWidth(.6)
             Output.setStrokeGray(0.5)
             Output.setFont('Courier', 9)
             PageCount += 1
             PageCount %= 2
+
+
 
         MonthCount += 1
 
