@@ -25,7 +25,7 @@ from reportlab.graphics import renderPM
 CALENDAR_START = datetime.date(2024,12,30) 
 CALENDAR_RANGE = 52
 
-OVERVIEW_YEARS = [2025,2026]
+OVERVIEW_YEARS = [2024,2025,2026]
 OVERVIEW_YPOS = 450 
 
 DOC_HEIGHT = 515
@@ -105,16 +105,15 @@ for year in OVERVIEW_YEARS:
 
 # Calendar
 def Calendar():
-    RightDesign(CalendarList[0][4]-OffsetWeek,CalendarList[0][5]-OffsetWeek,CalendarList[0][6]-OffsetWeek)
-
+    RightDesign(CalendarList[0][0]-OffsetWeek, CalendarList[0][4]-OffsetWeek,CalendarList[0][5]-OffsetWeek,CalendarList[0][6]-OffsetWeek)
     for WeekCount in range(CALENDAR_RANGE):
-        LeftDesign(CalendarList[WeekCount][0],CalendarList[WeekCount][1],CalendarList[WeekCount][2],CalendarList[WeekCount][3])
-        RightDesign(CalendarList[WeekCount][4],CalendarList[WeekCount][5],CalendarList[WeekCount][6])
+        LeftDesign(CalendarList[WeekCount][0],CalendarList[WeekCount][1],CalendarList[WeekCount][2],CalendarList[WeekCount][3],CalendarList[WeekCount][6])
+        RightDesign(CalendarList[WeekCount][0],CalendarList[WeekCount][4],CalendarList[WeekCount][5],CalendarList[WeekCount][6])
 
-    LeftDesign(CalendarList[-1][0]+OffsetWeek,CalendarList[-1][1]+OffsetWeek,CalendarList[-1][2]+OffsetWeek,CalendarList[-1][3]+OffsetWeek)
+    LeftDesign(CalendarList[-1][0]+OffsetWeek,CalendarList[-1][1]+OffsetWeek,CalendarList[-1][2]+OffsetWeek,CalendarList[-1][3]+OffsetWeek, CalendarList[-1][6]+OffsetWeek)
 
 
-def LeftDesign(DAY_0, DAY_1, DAY_2, DAY_3):
+def LeftDesign(DAY_0, DAY_1, DAY_2, DAY_3, DAY_6):
     Output.setLineWidth(GRID_LINE)
     Output.setStrokeGray(GRID_OPACITY)
 
@@ -159,13 +158,16 @@ def LeftDesign(DAY_0, DAY_1, DAY_2, DAY_3):
         Output.drawString(LineX1[0],GRID_YPOS+10,DAY_0.strftime("%B")+" - "+DAY_3.strftime("%B"))
 
     Output.setFont('Courier', 9)
-    Output.drawRightString(LineX2[2],GRID_YPOS+10,DAY_0.strftime("Week %W"))
+    if DAY_0.strftime("%W") == DAY_6.strftime("%W"):
+        Output.drawRightString(LineX2[2],GRID_YPOS+10,DAY_0.strftime("Week %W"))
+    else: 
+        Output.drawRightString(LineX2[2],GRID_YPOS+10,DAY_0.strftime("Week %W"+"/"+DAY_6.strftime("%W")))
 
     Cut()
 
     Output.showPage()
 
-def RightDesign(DAY_4, DAY_5, DAY_6):
+def RightDesign(DAY_0, DAY_4, DAY_5, DAY_6):
     Output.setLineWidth(GRID_LINE)
     Output.setStrokeGray(GRID_OPACITY)
 
@@ -210,7 +212,10 @@ def RightDesign(DAY_4, DAY_5, DAY_6):
         Output.drawRightString(LineX2[2],GRID_YPOS+10,DAY_4.strftime("%B")+" - "+DAY_6.strftime("%B"))
 
     Output.setFont('Courier', 9)
-    Output.drawString(LineX1[0],GRID_YPOS+10,DAY_4.strftime("Week %W"))
+    if DAY_0.strftime("%Y") == DAY_6.strftime("%Y"):
+        Output.drawString(LineX1[0],GRID_YPOS+10,DAY_0.strftime("%Y"))
+    else: 
+        Output.drawString(LineX1[0],GRID_YPOS+10,DAY_0.strftime("%Y")+" - "+ DAY_6.strftime("%Y"))
 
     Cut()
 
@@ -257,13 +262,14 @@ def Overview():
                 LineYi.append(LineYj)
             LineY.append(LineYi)
     
-    
-    OverviewList_merged = OverviewList[0]
-    OverviewList_merged.extend(OverviewList[1])
+    OverviewList_merged = [] 
+    for item in OverviewList:
+        OverviewList_merged.extend(item)
 
     GridCount = 0
     PageCount = 0
     MonthCount = 0
+    TotalMonthCount = len(OverviewList_merged) -1
 
     for month in LineY:
         Output.setFillGray(GRID_BOX)
@@ -299,7 +305,7 @@ def Overview():
                 LineX[0] = [x+DOC_MARGININ-DOC_MARGINOUT for x in LineX[0]]
                 LineX[1] = [x+DOC_MARGININ-DOC_MARGINOUT for x in LineX[1]]
 
-            if month != LineY[-1]:
+            if MonthCount < TotalMonthCount: #month != LineY[-1]:
                 Cut()
                 Output.showPage()
 
